@@ -1,0 +1,136 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 1200px; /* Adjust the maximum width as needed */
+    margin: 0 auto; /* Center the container horizontally */
+}
+
+header {
+    background-color: #4caf50;
+    color: white;
+    padding: 20px 20px; /* Adjust padding */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 100px; /* Adjust image width */
+    height: auto;
+    margin-right: 10px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0; /* Remove margin */
+    padding: 0; /* Remove padding */
+    justify-content: space-between; /* Align items horizontally with space between */
+}
+
+nav li {
+    margin-right: 10px;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: color 0.3s;
+    font-size: 16px; /* Adjust font size */
+    letter-spacing: 1px; /* Add some letter spacing for readability */
+}
+
+nav a:hover {
+    color: #333;
+}
+
+#menu {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#menu-toggle {
+    display: block;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#menu-toggle:hover {
+    background-color: #45a049;
+}
+
+@media screen and (min-width: 768px) {
+    #menu {
+        display: flex;
+    }
+}
+
+section {
+    padding: 50px 40px; /* Adjust padding */
+}
+
+#banner {
+    background-color: #f5f5f5;
+    text-align: center;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.cta-button:hover {
+    background-color: #45a049;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px 20px; /* Adjust padding */
+}
+
+.service {
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.food-item {
+    flex: 0 1 calc(33.33% - 20px); /* Adjust width of each food item */
+    margin-bottom: 20px;
+}
+
+.food-item img {
+    width: 60%;
+    height: auto;
+    border-radius: 5px;
+}
+
+.food-item p {
+    margin-top: 10px;
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPTM Food Bank System</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="uptm.png" alt="UPTM Food Bank Logo" width="80">
+            <h1>UPTM Food Bank System</h1>
+        </div>
+        
+        <nav id="menu">
+            <ul>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#services">Foods</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <!-- Add the login button here -->
+            </ul>
+        </nav>
+    </header>
+
+    <section id="banner">
+        <h2>Welcome to UPTM Food Bank</h2>
+        <p>Empowering communities through food distribution.</p>
+        <a href="requestfood.html" class="cta-button">Request Food</a>
+    </section>
+
+    <section id="about">
+        <h2>About Us</h2>
+        <p>Welcome to UPTM Food Bank System, where we are dedicated to making a positive impact on students through the distribution of food resources. Our mission is to eliminate hunger and promote well-being by efficiently managing and distributing food to those in need.</p>
+        <p>Founded in 2023, UPTM Food Bank System has been at the forefront of addressing food insecurity issues among students. We believe in the power of collective efforts to create lasting change.</p>
+    </section>
+
+    <section id="services">
+        <h2>Foods</h2>
+        <div class="service">
+            <h3>Food Distribution</h3>
+            <div class="container" id="food-container">
+                <!-- Stock information will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>Have questions or want to get involved? Reach out to us!</p>
+        <p>General Line: +603 9206 9700</p>
+        <p>Tel : +603 92837186 (Marketing)</p>
+        <p>Fax : +603 92810475</p>
+        <p>Email : marketing@uptm.edu.my</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 UPTM Food Bank System. All rights reserved.</p>
+        <a href="faq.html" class="cta-button">FAQ</a>
+    </footer>
+
+    <script>
+        // Function to fetch and display food stock
+        function fetchFoodStock() {
+            // Make an AJAX request to fetch stock data from the server
+            fetch('mainstock.php')
+                .then(response => response.json())
+                .then(data => {
+                    // Clear previous content
+                    document.getElementById('food-container').innerHTML = '';
+
+                    // Iterate through the stock data and create HTML elements
+                    data.forEach(item => {
+                        const foodItem = document.createElement('div');
+                        foodItem.classList.add('food-item');
+
+                        // Create an image element
+                        const img = document.createElement('img');
+                        img.src = item.image; // Assuming 'image' is the column name for storing image paths in your database
+                        img.alt = item.name;
+
+                        // Create a paragraph element for the food name
+                        const foodName = document.createElement('p');
+                        foodName.textContent = item.name;
+
+                        // Create a paragraph element for the stock quantity
+                        const stockQuantity = document.createElement('p');
+                        stockQuantity.textContent = 'Stock: ' + item.stock;
+
+                        // Append elements to the foodItem div
+                        foodItem.appendChild(img); // Append the image
+                        foodItem.appendChild(foodName);
+                        foodItem.appendChild(stockQuantity);
+
+                        // Append the foodItem div to the food container
+                        document.getElementById('food-container').appendChild(foodItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching food stock:', error));
+        }
+
+        // Fetch food stock initially when the page loads
+        fetchFoodStock();
+
+        // Fetch food stock every 10 seconds (adjust interval as needed)
+        setInterval(fetchFoodStock, 10000);
+    </script>
+</body>
+</html>

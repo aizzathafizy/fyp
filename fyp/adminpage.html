@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Bank Admin Page</title>
+    <link rel="stylesheet" href="adminpage.css">
+</head>
+<body>
+    <h1>UPTM Food Bank Admin Page</h1>
+
+    <!-- Add New Food Item Form -->
+    <h2>Add New Food Item</h2>
+    <form id="requestForm" action="submit.php" method="post" onsubmit="submitForm();">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="phone">Number Phone:</label>
+        <input type="number" id="phone" name="phone" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="food">Food Request:</label>
+        <div class="food-request">
+            <div class="food-item">
+                <select name="food[]" required>
+                    <option value="" disabled selected>Select Food</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Bread">Bread</option>
+                    <option value="Instant Food">Instant Food</option>
+                    <option value="Crackers">Crackers</option>
+                    <option value="3-in-1 Premix">3-in-1 Premix</option>
+                    <option value="Eggs">Eggs</option>
+                    <!-- Add more food options here -->
+                </select>
+                <input type="number" name="quantity[]" placeholder="Quantity" required>
+            </div>
+            <!-- Add more .food-item divs for additional food items -->
+        </div>
+        <button type="submit">Submit Request</button>
+    </form>
+
+
+
+    <h2>Add New Food Stock</h2>
+<form id="addStockForm" action="addstock.php" method="post" onsubmit="addStock(event);">
+    <label for="food">Food:</label>
+    <select name="food" id="food" required>
+        <option value="" disabled selected>Select Food</option>
+        <option value="Rice">Rice</option>
+        <option value="Bread">Bread</option>
+        <option value="Instant Food">Instant Food</option>
+        <option value="Crackers">Crackers</option>
+        <option value="3-in-1 Premix">3-in-1 Premix</option>
+        <option value="Eggs">Eggs</option>
+        <!-- Add more food options here -->
+    </select>
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" name="quantity" required>
+
+    <button type="submit">Add Stock</button>
+</form>
+
+
+
+
+    <!-- Food Items Table -->
+    <h2>Food Items</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Food</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="foodItemsTableBody">
+            <!-- Food items will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <!-- Approved Food Items Table -->
+    <h2>Approved Food Items</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Food</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody id="approvedFoodTableBody">
+            <!-- Approved food items will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <h2></h2>
+    <div id="foodStockContainer">
+        <!-- Food stock items will be dynamically added here -->
+    </div>
+
+    <!-- Message Display -->
+    <div id="message"></div>
+
+    <script>
+        // Function to add stock
+function addStock(event) {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    // Retrieve form data
+    var formData = new FormData(document.getElementById("addStockForm"));
+
+    // Send AJAX request to add stock to the database
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "addstock.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                // If adding stock was successful, display prompt message
+                showMessage("Stock added successfully.", true);
+            } else {
+                // Handle error if adding stock failed
+                showMessage("Failed to add stock.", false);
+            }
+        }
+    };
+    xhr.send("food=" + encodeURIComponent(formData.get("food")) + "&quantity=" + encodeURIComponent(formData.get("quantity")));
+}
+
+
+
+
+
+
+        // Function to approve a food item
+        function approveFoodItem(button) {
+            console.log("Approving food item...");
+            var row = button.parentNode.parentNode;
+            var name = row.cells[0].textContent;
+            var phone = row.cells[1].textContent;
+            var email = row.cells[2].textContent;
+            var food = row.cells[3].textContent;
+            var quantity = row.cells[4].textContent;
+
+            // Send AJAX request to update stock levels in the database
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "updatestock.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            // If the stock update was successful, remove the row from the main table
+                            row.parentNode.removeChild(row);
+                            
+                            // Add the approved food item to sessionStorage
+                            var approvedItems = JSON.parse(sessionStorage.getItem('approvedFoodItems')) || [];
+                            var newItem = { name: name, phone: phone, email: email, food: food, quantity: quantity };
+                            approvedItems.push(newItem);
+                            sessionStorage.setItem('approvedFoodItems', JSON.stringify(approvedItems));
+                            
+                            // Populate the approved food items table
+                            populateApprovedFoodItems();
+                            
+                            showMessage("Food item approved successfully.", true);
+                        } else {
+                            // Handle error if stock update failed
+                            showMessage("Failed to approve the food item.", false);
+                        }
+                    } else {
+                        showMessage("Error: " + xhr.statusText, false);
+                    }
+                }
+            };
+            xhr.send("name=" + encodeURIComponent(name) + "&phone=" + encodeURIComponent(phone) + "&email=" + encodeURIComponent(email) + "&food=" + encodeURIComponent(food) + "&quantity=" + encodeURIComponent(quantity));
+        }
+
+        // Function to populate the approved food items table
+        function populateApprovedFoodItems() {
+            var approvedTableBody = document.getElementById('approvedFoodTableBody');
+            approvedTableBody.innerHTML = '';
+
+            var approvedItems = JSON.parse(sessionStorage.getItem('approvedFoodItems')) || [];
+            approvedItems.forEach(item => {
+                var newRow = approvedTableBody.insertRow();
+                var cell1 = newRow.insertCell(0);
+                var cell2 = newRow.insertCell(1);
+                var cell3 = newRow.insertCell(2);
+                var cell4 = newRow.insertCell(3);
+                var cell5 = newRow.insertCell(4);
+
+                cell1.textContent = item.name;
+                cell2.textContent = item.phone;
+                cell3.textContent = item.email;
+                cell4.textContent = item.food;
+                cell5.textContent = item.quantity;
+            });
+        }
+
+        // Call populateApprovedFoodItems on page load to render approved food items
+        populateApprovedFoodItems();
+
+        // Function to handle form submission
+        function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            // Retrieve form data
+            var formData = new FormData(document.getElementById("requestForm"));
+
+            // Update the UI by adding a new row to the table for each food item
+            formData.getAll("food").forEach((food, index) => {
+                var tableBody = document.getElementById('foodItemsTableBody');
+                var newRow = tableBody.insertRow();
+                var cell1 = newRow.insertCell(0);
+                var cell2 = newRow.insertCell(1);
+                var cell3 = newRow.insertCell(2);
+                var cell4 = newRow.insertCell(3);
+                var cell5 = newRow.insertCell(4);
+                var cell6 = newRow.insertCell(5);
+
+                cell1.textContent = formData.get("name");
+                cell2.textContent = formData.get("phone");
+                cell3.textContent = formData.get("email");
+                cell4.textContent = food; // Display the selected food item
+                cell5.textContent = formData.getAll("quantity")[index]; // Display the corresponding quantity
+                cell6.innerHTML = '<button onclick="approveFoodItem(this)">Approve</button> <button onclick="confirmDelete(this)">Delete</button>';
+            });
+
+            // Display confirmation message
+            showMessage("Food items added successfully.", true);
+        }
+
+        // Function to display message
+        function showMessage(message, isSuccess) {
+            // Display popup message
+            alert(message);
+
+            // Optionally, display the message in the message element
+            var messageElement = document.getElementById("message");
+            messageElement.textContent = message;
+            messageElement.style.color = isSuccess ? "green" : "red";
+        }
+
+        // Add event listener to form submission
+        document.getElementById("requestForm").addEventListener("submit", submitForm);
+
+        // Fetch data from the server
+        fetch('admindisplay.php')
+            .then(response => response.json())
+            .then(data => {
+                // Populate the table with fetched data
+                var tableBody = document.getElementById('foodItemsTableBody');
+                data.forEach(item => {
+                    var newRow = tableBody.insertRow();
+                    var cell1 = newRow.insertCell(0);
+                    var cell2 = newRow.insertCell(1);
+                    var cell3 = newRow.insertCell(2);
+                    var cell4 = newRow.insertCell(3);
+                    var cell5 = newRow.insertCell(4);
+                    var cell6 = newRow.insertCell(5);
+
+                    cell1.textContent = item.name;
+                    cell2.textContent = item.phone;
+                    cell3.textContent = item.email;
+                    cell4.textContent = item.food;
+                    cell5.textContent = item.quantity;
+                    cell6.innerHTML = '<button onclick="approveFoodItem(this)">Approve</button> <button onclick="confirmDelete(this)">Delete</button>';
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        function confirmDelete(button) {
+            if (confirm("Are you sure you want to delete this food item?")) {
+                deleteFoodItem(button);
+            }
+        }
+
+        function deleteFoodItem(button) {
+            // Get the row containing the clicked button
+            var row = button.parentNode.parentNode;
+
+            // Extract data from the row
+            var name = row.cells[0].textContent;
+            var phone = row.cells[1].textContent;
+            var email = row.cells[2].textContent;
+            var food = row.cells[3].textContent;
+            var quantity = row.cells[4].textContent;
+
+            // Send an AJAX request to delete the record from the database
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "deletefooditem.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // If the deletion was successful, remove the row from the table
+                        if (xhr.responseText === "success") {
+                            row.parentNode.removeChild(row);
+                            showMessage("Food item deleted successfully.", true);
+                        } else {
+                            // Handle error if deletion failed
+                            showMessage("Failed to delete the food item.", false);
+                        }
+                    } else {
+                        showMessage("Error: " + xhr.statusText, false);
+                    }
+                }
+            };
+            xhr.send("name=" + encodeURIComponent(name) + "&phone=" + encodeURIComponent(phone) + "&email=" + encodeURIComponent(email) + "&food=" + encodeURIComponent(food) + "&quantity=" + encodeURIComponent(quantity));
+        }
+    </script>
+</body>
+</html>

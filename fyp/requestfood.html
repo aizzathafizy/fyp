@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPTM Food Bank System</title>
+    <link rel="stylesheet" href="requestfood.css">
+    <script>
+        function submitForm() {
+            // Your form submission logic here
+
+            // Display pop-up message
+            alert("Your request has been submitted successfully!");
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>UPTM Food Bank System</h1>
+    </header>
+    
+    <div class="container">
+        <form id="requestForm" action="submit.php" method="post" onsubmit="submitForm();">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="phone">Number Phone:</label>
+            <input type="number" id="phone" name="phone" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="food">Food Request:</label>
+            <div class="food-request">
+                <div class="food-item">
+                    <select name="food[]" required>
+                        <option value="" disabled selected>Select Food</option>
+                        <option value="Rice">Rice</option>
+                        <option value="Bread">Bread</option>
+                        <option value="Instant Food">Instant Food</option>
+                        <option value="Crackers">Crackers</option>
+                        <option value="3-in-1 Premix">3-in-1 Premix</option>
+                        <option value="Eggs">Eggs</option>
+                        <!-- Add more food options here -->
+                    </select>
+                    <input type="number" name="quantity[]" placeholder="Quantity" required>
+                </div>
+                <!-- Add more .food-item divs for additional food items -->
+            </div>
+            <button type="submit">Submit Request</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 UPTM Food Bank System. All rights reserved.</p>
+    </footer>
+</body>
+</html>
